@@ -1,6 +1,6 @@
 /**
- * WebGL2 Stable-Fluids Solver (ported from Chromasonic's fluid.ts & shaders.ts)
- * Re-engineered for FORMA's monochrome obsidian, alabaster, and liquid-silver theme.
+ * WebGL2 Stable-Fluids Background Animation (ported from Chromasonic's fluid.ts & shaders.ts)
+ * Configured with Chromasonic's Nebula physics in monochrome black, white, and silver.
  */
 
 export interface FluidSettings {
@@ -74,22 +74,6 @@ void main() {
   p.x *= aspectRatio;
   vec3 splat = exp(-dot(p, p) / radius) * color;
   outColor = vec4(texture(uTarget, vUv).xyz + splat, 1.0);
-}`;
-
-const radialShader = `${header}
-uniform sampler2D uTarget;
-uniform float aspectRatio;
-uniform vec2 point;
-uniform float radius;
-uniform float strength;
-void main() {
-  vec2 p = vUv - point;
-  p.x *= aspectRatio;
-  float d = length(p);
-  float ring = exp(-pow(d - radius, 2.0) / (radius * radius * 0.18));
-  vec2 push = d > 1e-4 ? p / d : vec2(0.0);
-  push.x /= aspectRatio;
-  outColor = vec4(texture(uTarget, vUv).xy + push * ring * strength, 0.0, 1.0);
 }`;
 
 const advectionShader = `${header}
@@ -198,29 +182,15 @@ void main() {
 const displayShader = `${header}
 uniform sampler2D uTexture;
 uniform sampler2D uBloom;
-uniform float aspectRatio;
 uniform float bloomIntensity;
 uniform float rays;
-uniform float segments;
 uniform float paper;
 uniform float time;
 
 float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 
-vec2 kaleidoscope(vec2 uv) {
-  vec2 p = uv - 0.5;
-  p.x *= aspectRatio;
-  float r = length(p);
-  float wedge = 6.2831853 / segments;
-  float a = mod(atan(p.y, p.x) + time * 0.05, wedge);
-  a = abs(a - wedge * 0.5);
-  p = r * vec2(cos(a), sin(a));
-  p.x /= aspectRatio;
-  return clamp(p + 0.5, 0.0, 1.0);
-}
-
 void main() {
-  vec2 uv = segments > 1.5 ? kaleidoscope(vUv) : vUv;
+  vec2 uv = vUv;
   vec3 dye = texture(uTexture, uv).rgb;
   vec3 bloom = texture(uBloom, uv).rgb;
 
@@ -238,23 +208,19 @@ void main() {
   }
 
   vec3 light = dye + bloom * bloomIntensity + shafts;
-  // Desaturate slightly toward a cool metallic silver/platinum tone
-  float luma = dot(light, vec3(0.2126, 0.7152, 0.0722));
-  vec3 metallic = mix(vec3(luma) * vec3(0.95, 0.97, 1.02), light, 0.35);
-
   vec3 color;
   if (paper > 0.5) {
-    // Light theme: graphite and pewter smoke ribbons on cool alabaster (#f5f6f8)
+    // Light theme: soft pewter & graphite smoke on alabaster (#f5f6f8)
     vec3 sheet = vec3(0.961, 0.965, 0.973);
-    float coverage = 1.0 - exp(-max(metallic.r, max(metallic.g, metallic.b)) * 1.45);
-    vec3 graphite = vec3(0.08, 0.09, 0.12);
-    color = mix(sheet, graphite, coverage * 0.82);
+    float coverage = 1.0 - exp(-max(light.r, max(light.g, light.b)) * 1.25);
+    vec3 graphite = vec3(0.14, 0.16, 0.20);
+    color = mix(sheet, graphite, coverage * 0.58);
   } else {
-    // Dark theme: luminous silver & pearl smoke over deep obsidian (#07080a)
-    vec3 obsidian = vec3(0.027, 0.031, 0.039);
-    vec3 mapped = 1.0 - exp(-metallic * 1.3);
-    color = obsidian + mapped * (1.0 - obsidian);
-    color = pow(color, vec3(1.0 / 1.08));
+    // Dark theme: Chromasonic's velvety smoke curve over obsidian (#07080a)
+    vec3 obsidian = vec3(0.0275, 0.0314, 0.0392);
+    vec3 smoke = 1.0 - exp(-light * 1.25);
+    smoke = pow(smoke, vec3(1.0 / 1.1));
+    color = mix(obsidian, vec3(1.0), smoke);
   }
   color += (hash(gl_FragCoord.xy + time) - 0.5) / 255.0;
   outColor = vec4(color, 1.0);
@@ -332,17 +298,17 @@ export class Fluid {
   private iterations: number;
   private destroyed = false;
 
+  // Chromasonic Nebula preset parameters for smooth, atmospheric smoke
   settings: FluidSettings = {
-    curl: 24,
-    velocityDissipation: 0.26,
-    densityDissipation: 0.72,
+    curl: 16,
+    velocityDissipation: 0.3,
+    densityDissipation: 0.95,
     pressure: 0.8,
-    splatRadius: 0.28,
-    bloom: 0.95,
-    rays: 0.85,
+    splatRadius: 0.32,
+    bloom: 1,
+    rays: 1,
     paper: false,
   };
-  segments = 1;
   frames = 0;
   splats = 0;
   time = 0;
@@ -360,7 +326,6 @@ export class Fluid {
     this.programs = {
       clear: new Program(gl, vertex, clearShader),
       splat: new Program(gl, vertex, splatShader),
-      radial: new Program(gl, vertex, radialShader),
       advection: new Program(gl, vertex, advectionShader),
       divergence: new Program(gl, vertex, divergenceShader),
       curl: new Program(gl, vertex, curlShader),
@@ -404,7 +369,7 @@ export class Fluid {
       if (!gl || !gl.getExtension("EXT_color_buffer_float")) return null;
       return new Fluid(canvas, gl, lowPower);
     } catch (error) {
-      console.warn("Fluid simulation unavailable:", error);
+      console.warn("Fluid smoke unavailable:", error);
       return null;
     }
   }
@@ -528,25 +493,6 @@ export class Fluid {
     this.bloomB = this.target(bloom.width, bloom.height, gl.RGBA16F, gl.RGBA);
   }
 
-  clear() {
-    if (this.destroyed) return;
-    const gl = this.gl;
-    for (const t of [
-      this.velocity.read,
-      this.velocity.write,
-      this.dye.read,
-      this.dye.write,
-      this.pressureTargets.read,
-      this.pressureTargets.write,
-    ]) {
-      gl.bindFramebuffer(gl.FRAMEBUFFER, t.fbo);
-      gl.viewport(0, 0, t.width, t.height);
-      gl.clearColor(0, 0, 0, 0);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-    }
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  }
-
   private bindTexture(unit: number, texture: WebGLTexture) {
     const gl = this.gl;
     gl.activeTexture(gl.TEXTURE0 + unit);
@@ -574,7 +520,7 @@ export class Fluid {
     return this.canvas.width / Math.max(1, this.canvas.height);
   }
 
-  /** Adds velocity (in pixels per second) and dye at a point in 0..1 UV space. */
+  /** Adds velocity (in pixels per second) and silver smoke dye at a point in 0..1 UV space. */
   splat(
     x: number,
     y: number,
@@ -607,22 +553,7 @@ export class Fluid {
     this.splats++;
   }
 
-  /** An expanding radial ring of velocity. */
-  pulse(x: number, y: number, strength: number, radius = 0.14) {
-    if (this.destroyed) return;
-    const gl = this.gl;
-    const u = this.programs.radial.use();
-    gl.uniform1i(u.uTarget, this.bindTexture(0, this.velocity.read.texture));
-    gl.uniform1f(u.aspectRatio, this.aspect);
-    gl.uniform2f(u.point, x, y);
-    gl.uniform1f(u.radius, radius);
-    gl.uniform1f(u.strength, strength);
-    this.texel(this.velocity.read, u);
-    this.draw(this.velocity.write);
-    this.velocity.swap();
-  }
-
-  step(rawDt: number, energy = 0) {
+  step(rawDt: number) {
     if (this.destroyed) return;
     const gl = this.gl;
     const dt = Math.min(rawDt, 1 / 30);
@@ -640,7 +571,7 @@ export class Fluid {
     this.texel(v.read, u);
     gl.uniform1i(u.uVelocity, this.bindTexture(0, v.read.texture));
     gl.uniform1i(u.uCurl, this.bindTexture(1, this.curlTarget.texture));
-    gl.uniform1f(u.curl, s.curl * (1 + energy * 0.6));
+    gl.uniform1f(u.curl, s.curl);
     gl.uniform1f(u.dt, dt);
     this.draw(v.write);
     v.swap();
@@ -697,12 +628,12 @@ export class Fluid {
     this.dye.swap();
   }
 
-  render(energy = 0) {
+  render() {
     if (this.destroyed) return;
     const gl = this.gl;
     let u = this.programs.prefilter.use();
     gl.uniform1i(u.uTexture, this.bindTexture(0, this.dye.read.texture));
-    gl.uniform1f(u.threshold, 0.52);
+    gl.uniform1f(u.threshold, 0.55);
     this.draw(this.bloomA);
     u = this.programs.blur.use();
     for (let pass = 0; pass < 2; pass++) {
@@ -717,10 +648,8 @@ export class Fluid {
     u = this.programs.display.use();
     gl.uniform1i(u.uTexture, this.bindTexture(0, this.dye.read.texture));
     gl.uniform1i(u.uBloom, this.bindTexture(1, this.bloomA.texture));
-    gl.uniform1f(u.aspectRatio, this.aspect);
-    gl.uniform1f(u.bloomIntensity, this.settings.bloom * (0.75 + energy * 1.4));
+    gl.uniform1f(u.bloomIntensity, this.settings.bloom * 0.7);
     gl.uniform1f(u.rays, this.settings.rays);
-    gl.uniform1f(u.segments, this.segments);
     gl.uniform1f(u.paper, this.settings.paper ? 1 : 0);
     gl.uniform1f(u.time, this.time);
     this.draw(null);

@@ -67,7 +67,7 @@ export default function StickyHeader() {
             )}
           </button>
           <a
-            href="#primitives"
+            href="#capabilities"
             className="rounded-full bg-foreground px-3.5 py-1.5 font-medium text-background transition-opacity hover:opacity-85"
           >
             Capabilities
