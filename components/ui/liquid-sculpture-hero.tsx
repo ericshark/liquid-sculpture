@@ -445,11 +445,13 @@ class LiquidEngine {
   private ready = false
   private destroyed = false
   private lost = false
+  private frameCount = 0
 
   constructor(canvas: HTMLCanvasElement, opts: EngineOptions, onFail: () => void) {
     this.canvas = canvas
     this.opts = opts
     this.onFail = onFail
+    this.canvas.dataset.motion = opts.reducedMotion ? "reduced" : "full"
     // alpha: an unpresented canvas stays transparent, so the static image under it shows
     const gl = canvas.getContext("webgl2", {
       alpha: true,
@@ -700,6 +702,7 @@ class LiquidEngine {
       (o.density !== undefined && o.density !== this.opts.density) ||
       (o.imgBg !== undefined && String(o.imgBg) !== String(this.opts.imgBg))
     this.opts = { ...this.opts, ...o }
+    this.canvas.dataset.motion = this.opts.reducedMotion ? "reduced" : "full"
     if (rebuild && this.ready && this.lastImage) {
       try {
         this.buildParticles(this.lastImage)
@@ -995,6 +998,10 @@ class LiquidEngine {
     else gl.uniform3f(P.u.uTint, br / Math.max(ir, 0.001), bg / Math.max(ig, 0.001), bb / Math.max(ib, 0.001))
     gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.n)
     gl.disable(gl.BLEND)
+    this.frameCount++
+    if (this.frameCount <= 2 || this.frameCount % 10 === 0) {
+      this.canvas.dataset.frames = String(this.frameCount)
+    }
   }
 
   destroy() {
@@ -1102,6 +1109,8 @@ export interface SculptureHeroProps {
   speed?: number
   /** Assembly animation on load. */
   intro?: boolean
+  /** Honor OS prefers-reduced-motion restriction (default false: full visual motion always runs). */
+  respectReducedMotion?: boolean
 
   /** Hero height. Default fills the screen exactly, no scrolling. */
   height?: string
@@ -1260,8 +1269,8 @@ const CSS = `
   .sh-credit{right:auto;left:50%;transform:translateX(-50%)}
 }
 @media (prefers-reduced-motion:reduce){
-  .sh-hint::before{animation:none}
-  .sh-canvas,.sh-fallback,.sh-btn,.sh-btn svg,.sh-txt svg{transition:none}
+  .sh-root[data-respect-rm="1"] .sh-hint::before{animation:none}
+  .sh-root[data-respect-rm="1"] .sh-canvas,.sh-root[data-respect-rm="1"] .sh-fallback,.sh-root[data-respect-rm="1"] .sh-btn,.sh-root[data-respect-rm="1"] .sh-btn svg,.sh-root[data-respect-rm="1"] .sh-txt svg{transition:none}
 }
 `
 
@@ -1358,6 +1367,7 @@ export default function SculptureHero(props: SculptureHeroProps) {
     ambientIntensity = 1,
     speed = 1,
     intro = false,
+    respectReducedMotion = false,
     height = "100svh",
     backdropText = "forma",
     showCredit = true,
@@ -1427,6 +1437,8 @@ export default function SculptureHero(props: SculptureHeroProps) {
   })
   const optsRef = React.useRef(engineOpts)
   optsRef.current = engineOpts
+  const respectRmRef = React.useRef(respectReducedMotion)
+  respectRmRef.current = respectReducedMotion
 
   React.useEffect(() => {
     if (loadFonts) injectFonts()
@@ -1491,7 +1503,7 @@ export default function SculptureHero(props: SculptureHeroProps) {
       root.dataset.gl = "off"
     }
     try {
-      engine = new LiquidEngine(canvas, optsRef.current(mq.matches), fail)
+      engine = new LiquidEngine(canvas, optsRef.current(respectRmRef.current ? mq.matches : false), fail)
       engineRef.current = engine
     } catch {
       fail()
@@ -1508,7 +1520,7 @@ export default function SculptureHero(props: SculptureHeroProps) {
     io.observe(root)
     const onVis = () => engine?.setVisible(!document.hidden)
     document.addEventListener("visibilitychange", onVis)
-    const onMq = () => engine?.setOptions({ reducedMotion: mq.matches })
+    const onMq = () => engine?.setOptions({ reducedMotion: respectRmRef.current ? mq.matches : false })
     mq.addEventListener?.("change", onMq)
 
     const pos = (e: PointerEvent) => {
@@ -1612,9 +1624,9 @@ export default function SculptureHero(props: SculptureHeroProps) {
   React.useEffect(() => {
     const e = engineRef.current
     if (!e) return
-    const rm = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    const rm = respectReducedMotion ? window.matchMedia("(prefers-reduced-motion: reduce)").matches : false
     e.setOptions(optsRef.current(rm))
-  }, [interactive, strength, radius, particleDensity, dotSize, particleSpread, turbulence, liquid, streaks, restStyle, returnSpeed, ambient, ambientIntensity, speed, intro, bgRgb, imgBgRgb])
+  }, [interactive, strength, radius, particleDensity, dotSize, particleSpread, turbulence, liquid, streaks, restStyle, returnSpeed, ambient, ambientIntensity, speed, intro, respectReducedMotion, bgRgb, imgBgRgb])
 
   React.useEffect(() => {
     relayout()
@@ -1639,7 +1651,7 @@ export default function SculptureHero(props: SculptureHeroProps) {
   }
 
   return (
-    <section ref={rootRef} className={"sh-root" + (className ? " " + className : "")} style={{ ...vars, ...style }}>
+    <section ref={rootRef} className={"sh-root" + (className ? " " + className : "")} style={{ ...vars, ...style }} data-respect-rm={respectReducedMotion ? "1" : undefined}>
       <style>{CSS}</style>
       {backdropText ? (
         <div ref={backdropRef} className="sh-backdrop" aria-hidden="true">

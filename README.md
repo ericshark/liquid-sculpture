@@ -12,3 +12,7 @@ pnpm dev -p 3001
 - `lib/fluid-smoke.ts` & `components/smoke-section.tsx` — Chromasonic's mouse-interactive smoke background adapted to monochrome silver, rendered as the full-screen second section.
 - `scripts/make-sculpture.mjs` — regenerates the braided silver sculpture SVGs in `public/` (`node scripts/make-sculpture.mjs`).
 - Theme lives on `<html data-theme>`; the hero's toggle, sticky header, and smoke section share it.
+
+## Motion & Browser Behavior
+
+All visual motion runs independently of operating-system reduced-motion settings (such as Windows animation restrictions / `prefers-reduced-motion: reduce`) by default. Pass `respectReducedMotion` to `SculptureHero` to opt into OS reduced-motion throttling. Hardware quality tiers and static SVG fallbacks remain active when WebGL2 is unavailable.

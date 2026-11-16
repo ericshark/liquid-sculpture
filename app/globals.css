@@ -123,13 +123,11 @@ body::after {
 }
 
 /* sections rise into place as they scroll in (progressive enhancement for view timelines) */
-@media (prefers-reduced-motion: no-preference) {
-  @supports ((animation-timeline: view()) and (animation-range: entry)) {
-    .reveal {
-      animation: reveal-rise linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 55%;
-    }
+@supports ((animation-timeline: view()) and (animation-range: entry)) {
+  .reveal {
+    animation: reveal-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 55%;
   }
 }
 
