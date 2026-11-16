@@ -212,15 +212,15 @@ void main() {
   if (paper > 0.5) {
     // Light theme: soft pewter & graphite smoke on alabaster (#f5f6f8)
     vec3 sheet = vec3(0.961, 0.965, 0.973);
-    float coverage = 1.0 - exp(-max(light.r, max(light.g, light.b)) * 1.25);
-    vec3 graphite = vec3(0.14, 0.16, 0.20);
-    color = mix(sheet, graphite, coverage * 0.58);
+    float coverage = 1.0 - exp(-max(light.r, max(light.g, light.b)) * 1.1);
+    vec3 graphite = vec3(0.18, 0.2, 0.24);
+    color = mix(sheet, graphite, coverage * 0.48);
   } else {
-    // Dark theme: Chromasonic's velvety smoke curve over obsidian (#07080a)
+    // Dark theme: velvety silver smoke over obsidian (#07080a), capped for crisp text legibility
     vec3 obsidian = vec3(0.0275, 0.0314, 0.0392);
     vec3 smoke = 1.0 - exp(-light * 1.25);
     smoke = pow(smoke, vec3(1.0 / 1.1));
-    color = mix(obsidian, vec3(1.0), smoke);
+    color = mix(obsidian, vec3(0.84, 0.86, 0.91), clamp(smoke, 0.0, 1.0));
   }
   color += (hash(gl_FragCoord.xy + time) - 0.5) / 255.0;
   outColor = vec4(color, 1.0);

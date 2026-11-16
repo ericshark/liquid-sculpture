@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Accent } from "@/components/section-heading";
-import { smokeContent } from "@/data/showcase";
+import { siteMeta, smokeContent } from "@/data/showcase";
 import { Fluid, isSoftwareRenderer } from "@/lib/fluid-smoke";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
@@ -16,12 +16,12 @@ declare global {
   }
 }
 
-// Monochromatic silver/white palette replacing Chromasonic's Scriabin colours
+// Monochromatic silver/white palette replacing Chromasonic's red/rainbow hues
 const SILVER_TONES: [number, number, number][] = [
-  [0.85, 0.88, 0.94],
-  [0.95, 0.96, 1.0],
-  [0.68, 0.72, 0.8],
-  [0.78, 0.81, 0.87],
+  [0.82, 0.85, 0.91],
+  [0.92, 0.94, 0.98],
+  [0.64, 0.68, 0.76],
+  [0.75, 0.78, 0.85],
 ];
 
 export default function SmokeSection() {
@@ -60,20 +60,17 @@ export default function SmokeSection() {
 
     fluid.settings.paper = stateRef.current.theme === "light";
 
-    // Seed gentle initial silver smoke plumes matching Chromasonic's ambient feel
-    const seed = () => {
-      const seeds = [
-        { x: 0.25, y: 0.2, dx: 180, dy: 280 },
-        { x: 0.55, y: 0.16, dx: -140, dy: 320 },
-        { x: 0.78, y: 0.24, dx: -190, dy: 260 },
-      ];
-      seeds.forEach((s, i) => {
-        const tone = SILVER_TONES[i % SILVER_TONES.length];
-        const color = tone.map((v) => v * 0.26) as [number, number, number];
-        fluid.splat(s.x, s.y, s.dx, s.dy, color, 1.4);
-      });
-    };
-    seed();
+    // Seed gentle rising silver smoke plumes on initial mount
+    const seeds = [
+      { x: 0.24, y: 0.18, dx: 190, dy: 300 },
+      { x: 0.56, y: 0.14, dx: -150, dy: 340 },
+      { x: 0.8, y: 0.22, dx: -200, dy: 280 },
+    ];
+    seeds.forEach((s, i) => {
+      const tone = SILVER_TONES[i % SILVER_TONES.length];
+      const color = tone.map((v) => v * 0.26) as [number, number, number];
+      fluid.splat(s.x, s.y, s.dx, s.dy, color, 1.4);
+    });
 
     let visible = true;
     const io = new IntersectionObserver(
@@ -102,8 +99,8 @@ export default function SmokeSection() {
       if (pointer.has) {
         const dx = (x - pointer.x) * rect.width;
         const dy = (y - pointer.y) * rect.height;
-        const force = pointer.down ? 14 : 4;
-        const ink = pointer.down ? 0.12 : 0.025;
+        const force = pointer.down ? 14 : 6;
+        const ink = pointer.down ? 0.14 : 0.055;
         const tone =
           SILVER_TONES[stateRef.current.toneIndex++ % SILVER_TONES.length];
         const color = tone.map((c) => c * ink) as [number, number, number];
@@ -113,7 +110,7 @@ export default function SmokeSection() {
           dx * force,
           dy * force,
           color,
-          pointer.down ? 0.6 : 0.4,
+          pointer.down ? 0.65 : 0.48,
         );
         stateRef.current.lastPointerAt = performance.now();
       }
@@ -126,7 +123,6 @@ export default function SmokeSection() {
       pointer.has = false;
     };
 
-    // Listen on section so hovering over overlaid text also stirs the smoke smoothly
     section.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("pointerup", onPointerUp);
     section.addEventListener("pointermove", onPointerMove);
@@ -146,15 +142,14 @@ export default function SmokeSection() {
       last = now;
       fluid.resize();
 
-      // Slow ambient silver smoke bloom while idle (matches Chromasonic's main.ts loop)
       if (
-        now - stateRef.current.lastPointerAt > 3500 &&
+        now - stateRef.current.lastPointerAt > 3000 &&
         now - lastAmbient > 1400
       ) {
         lastAmbient = now;
         const tone =
           SILVER_TONES[stateRef.current.toneIndex++ % SILVER_TONES.length];
-        const c = tone.map((v) => v * 0.25) as [number, number, number];
+        const c = tone.map((v) => v * 0.24) as [number, number, number];
         fluid.splat(
           Math.random(),
           Math.random() * 0.4 + 0.1,
@@ -192,9 +187,9 @@ export default function SmokeSection() {
   return (
     <section
       ref={sectionRef}
-      id="craft"
+      id="smoke"
       aria-label="Interactive silver smoke background"
-      className="relative flex min-h-[600px] w-full items-center overflow-hidden border-y border-border bg-background sm:min-h-[680px]"
+      className="relative flex min-h-svh w-full flex-col justify-between overflow-hidden border-t border-border bg-background"
     >
       {/* Pure Chromasonic smoke background canvas */}
       <canvas
@@ -215,39 +210,51 @@ export default function SmokeSection() {
         />
       )}
 
-      {/* Soft top/bottom fade to blend into adjacent sections */}
+      {/* Soft edge & readability scrims so overlaid text always stays crisp */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-background to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background/90 to-transparent"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_65%_55%_at_25%_50%,color-mix(in_oklab,var(--background)_72%,transparent),transparent_78%)]"
       />
 
-      {/* Clean design-oriented editorial framing over the smoke */}
-      <div className="pointer-events-none relative z-10 mx-auto w-full max-w-6xl px-5 py-24 sm:px-8 sm:py-32">
+      {/* Spacer for fixed StickyHeader */}
+      <div className="h-16" aria-hidden="true" />
+
+      {/* Minimal, readable design-oriented copy */}
+      <div className="pointer-events-none relative z-10 mx-auto w-full max-w-6xl px-5 py-16 sm:px-8">
         <p className="flex items-center gap-3 font-mono text-[11px] tracking-[0.18em] text-muted-foreground uppercase">
           <span className="text-silver">{smokeContent.index}</span>
           <span className="h-px w-10 bg-silver/60" />
           {smokeContent.label}
         </p>
 
-        <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end lg:gap-16">
-          <h2 className="max-w-2xl text-4xl leading-[0.98] font-medium tracking-[-0.035em] text-balance sm:text-5xl lg:text-6xl">
-            {smokeContent.headline} <Accent>{smokeContent.accent}</Accent>
-          </h2>
+        <h2 className="mt-6 max-w-3xl text-4xl leading-[0.96] font-medium tracking-[-0.04em] text-balance sm:text-6xl lg:text-7xl">
+          {smokeContent.headline} <Accent>{smokeContent.accent}</Accent>
+        </h2>
 
-          <div className="space-y-5">
-            <p className="max-w-md text-[17px] leading-relaxed text-pretty text-foreground/85">
-              {smokeContent.body}
-            </p>
-            <p className="font-mono text-[11px] tracking-[0.16em] text-muted-foreground uppercase">
-              {smokeContent.cue}
-            </p>
-          </div>
-        </div>
+        <p className="mt-6 max-w-lg text-[17px] leading-relaxed text-pretty text-foreground/85 sm:text-lg">
+          {smokeContent.body}
+        </p>
+
+        <p className="mt-8 font-mono text-[11px] tracking-[0.16em] text-muted-foreground uppercase">
+          {smokeContent.cue}
+        </p>
       </div>
+
+      {/* Minimal footer bar anchored inside the bottom of the second screen */}
+      <footer className="relative z-10 mx-auto w-full max-w-6xl px-5 sm:px-8">
+        <div className="flex flex-wrap justify-between gap-3 border-t border-border/70 py-7 font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase">
+          <p>
+            {siteMeta.brand}® · {siteMeta.edition}
+          </p>
+          <a href="#top" className="transition-colors hover:text-silver">
+            Back to top ↑
+          </a>
+        </div>
+      </footer>
     </section>
   );
 }

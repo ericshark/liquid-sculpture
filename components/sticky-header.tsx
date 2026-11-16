@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
-import { heroContent, navLinks } from "@/data/showcase";
+import { heroContent } from "@/data/showcase";
 import { setTheme, useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
-/** Compact nav that slides in once the hero (and its own nav) has scrolled away. */
+/** Compact nav that slides in once the hero has scrolled away. */
 export default function StickyHeader() {
   const theme = useTheme();
   const [shown, setShown] = useState(false);
@@ -37,19 +37,7 @@ export default function StickyHeader() {
         <a href="#top" className="text-[15px] font-semibold tracking-tight">
           {heroContent.brand}
         </a>
-        <div className="flex items-center gap-5 text-[13px]">
-          <ul className="hidden items-center gap-5 md:flex">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  className="text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+        <div className="flex items-center gap-4 text-[13px]">
           <button
             type="button"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -67,10 +55,10 @@ export default function StickyHeader() {
             )}
           </button>
           <a
-            href="#capabilities"
+            href="#top"
             className="rounded-full bg-foreground px-3.5 py-1.5 font-medium text-background transition-opacity hover:opacity-85"
           >
-            Capabilities
+            Back to top ↑
           </a>
         </div>
       </nav>
