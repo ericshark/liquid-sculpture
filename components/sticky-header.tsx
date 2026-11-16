@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
-import { navLinks } from "@/components/portfolio-hero";
-import { profile } from "@/data/portfolio";
+import { heroContent, navLinks } from "@/data/showcase";
 import { setTheme, useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
@@ -36,8 +35,7 @@ export default function StickyHeader() {
         className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-5 sm:px-8"
       >
         <a href="#top" className="text-[15px] font-semibold tracking-tight">
-          {profile.name}
-          <span className="text-ember">.</span>
+          {heroContent.brand}
         </a>
         <div className="flex items-center gap-5 text-[13px]">
           <ul className="hidden items-center gap-5 md:flex">
@@ -56,7 +54,9 @@ export default function StickyHeader() {
             type="button"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             aria-label={
-              theme === "dark" ? "Switch to light theme" : "Switch to dark theme"
+              theme === "dark"
+                ? "Switch to light theme"
+                : "Switch to dark theme"
             }
             className="grid size-8 place-items-center rounded-full border border-border transition-colors hover:bg-foreground hover:text-background"
           >
@@ -67,10 +67,10 @@ export default function StickyHeader() {
             )}
           </button>
           <a
-            href="#contact"
+            href="#primitives"
             className="rounded-full bg-foreground px-3.5 py-1.5 font-medium text-background transition-opacity hover:opacity-85"
           >
-            Contact
+            Capabilities
           </a>
         </div>
       </nav>

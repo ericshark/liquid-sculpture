@@ -11,8 +11,10 @@
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --font-serif: var(--font-instrument-serif), "Times New Roman", serif;
   --font-heading: var(--font-geist-sans), "Helvetica Neue", Arial, sans-serif;
-  --color-ember: var(--ember);
-  --color-ember-soft: var(--ember-soft);
+  --color-silver: var(--silver);
+  --color-silver-soft: var(--silver-soft);
+  --color-ember: var(--silver);
+  --color-ember-soft: var(--silver-soft);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -38,55 +40,55 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Ink & ember — dark is the default theme */
+/* Obsidian, Alabaster & Liquid Silver — dark is the default theme */
 :root,
 [data-theme="dark"] {
   color-scheme: dark;
-  --background: #0e1116;
-  --foreground: #ede6d8;
-  --card: #141820;
-  --card-foreground: #ede6d8;
-  --popover: #141820;
-  --popover-foreground: #ede6d8;
-  --primary: #ff6a3d;
-  --primary-foreground: #0e1116;
-  --secondary: #1b2029;
-  --secondary-foreground: #ede6d8;
-  --muted: #1b2029;
-  --muted-foreground: #8a8f98;
-  --accent: #1b2029;
-  --accent-foreground: #ede6d8;
-  --destructive: #ff5a4f;
-  --border: rgb(237 230 216 / 11%);
-  --input: rgb(237 230 216 / 15%);
-  --ring: #ff6a3d;
-  --ember: #ff6a3d;
-  --ember-soft: rgb(255 106 61 / 14%);
+  --background: #07080a;
+  --foreground: #f4f5f7;
+  --card: #0d0f13;
+  --card-foreground: #f4f5f7;
+  --popover: #0d0f13;
+  --popover-foreground: #f4f5f7;
+  --primary: #d4d8e1;
+  --primary-foreground: #07080a;
+  --secondary: #14171e;
+  --secondary-foreground: #f4f5f7;
+  --muted: #14171e;
+  --muted-foreground: #8e95a3;
+  --accent: #181c24;
+  --accent-foreground: #f4f5f7;
+  --destructive: #e2e5ec;
+  --border: rgb(244 245 247 / 13%);
+  --input: rgb(244 245 247 / 18%);
+  --ring: #c8ced8;
+  --silver: #c8ced8;
+  --silver-soft: rgb(200 206 216 / 12%);
   --radius: 0.75rem;
 }
 
 [data-theme="light"] {
   color-scheme: light;
-  --background: #f1ece2;
-  --foreground: #15171c;
-  --card: #f7f3eb;
-  --card-foreground: #15171c;
-  --popover: #f7f3eb;
-  --popover-foreground: #15171c;
-  --primary: #d9481f;
-  --primary-foreground: #f7f3eb;
-  --secondary: #e7e0d3;
-  --secondary-foreground: #15171c;
-  --muted: #e7e0d3;
-  --muted-foreground: #5d6068;
-  --accent: #e7e0d3;
-  --accent-foreground: #15171c;
-  --destructive: #c62d22;
-  --border: rgb(21 23 28 / 12%);
-  --input: rgb(21 23 28 / 16%);
-  --ring: #d9481f;
-  --ember: #d9481f;
-  --ember-soft: rgb(217 72 31 / 10%);
+  --background: #f5f6f8;
+  --foreground: #0a0b0e;
+  --card: #ffffff;
+  --card-foreground: #0a0b0e;
+  --popover: #ffffff;
+  --popover-foreground: #0a0b0e;
+  --primary: #4a505c;
+  --primary-foreground: #f5f6f8;
+  --secondary: #e9ebef;
+  --secondary-foreground: #0a0b0e;
+  --muted: #e9ebef;
+  --muted-foreground: #585e6c;
+  --accent: #e9ebef;
+  --accent-foreground: #0a0b0e;
+  --destructive: #1c1f26;
+  --border: rgb(10 11 14 / 13%);
+  --input: rgb(10 11 14 / 18%);
+  --ring: #4a505c;
+  --silver: #4a505c;
+  --silver-soft: rgb(74 80 92 / 10%);
 }
 
 @layer base {
@@ -99,33 +101,74 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
+    accent-color: var(--silver);
     transition:
       background-color 0.6s ease,
       color 0.6s ease;
   }
   ::selection {
-    background: var(--ember);
+    background: var(--silver);
     color: var(--primary-foreground);
   }
 }
 
-/* film grain over everything, hero included */
+/* Fallback for older browsers without accent-color */
+@supports not (accent-color: var(--silver)) {
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 6px;
+    background: var(--border);
+    border-radius: 999px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 14px;
+    width: 14px;
+    border-radius: 50%;
+    background: var(--silver);
+    cursor: pointer;
+    margin-top: -4px;
+  }
+  input[type="range"]::-moz-range-track {
+    width: 100%;
+    height: 6px;
+    background: var(--border);
+    border-radius: 999px;
+  }
+  input[type="range"]::-moz-range-thumb {
+    height: 14px;
+    width: 14px;
+    border-radius: 50%;
+    background: var(--silver);
+    cursor: pointer;
+  }
+}
+
+/* subtle film grain over everything, hero included */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 60;
   pointer-events: none;
-  opacity: 0.05;
+  opacity: 0.04;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* sections rise into place as they scroll in (browsers without scroll timelines just show them) */
-@supports (animation-timeline: view()) {
-  .reveal {
-    animation: reveal-rise linear both;
-    animation-timeline: view();
-    animation-range: entry 0% entry 55%;
+/* sections rise into place as they scroll in (progressive enhancement for view timelines) */
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    .reveal {
+      animation: reveal-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
   }
 }
 
@@ -140,9 +183,9 @@ body::after {
   }
 }
 
-@keyframes ember-pulse {
+@keyframes silver-pulse {
   from {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--ember) 55%, transparent);
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--silver) 55%, transparent);
   }
   to {
     box-shadow: 0 0 0 8px transparent;

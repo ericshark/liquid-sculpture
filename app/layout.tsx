@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
-import { siteMeta } from "@/data/portfolio";
+import { siteMeta } from "@/data/showcase";
 import { themeInitScript } from "@/lib/theme-script";
 import "./globals.css";
 
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0e1116",
+  themeColor: "#07080a",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -4,12 +4,16 @@ type SectionHeadingProps = {
   title: React.ReactNode;
 };
 
-export default function SectionHeading({ index, label, title }: SectionHeadingProps) {
+export default function SectionHeading({
+  index,
+  label,
+  title,
+}: SectionHeadingProps) {
   return (
     <div className="reveal mb-12 sm:mb-16">
       <p className="flex items-center gap-3 font-mono text-[11px] tracking-[0.18em] text-muted-foreground uppercase">
-        <span className="text-ember">{index}</span>
-        <span className="h-px w-10 bg-ember/60" />
+        <span className="text-silver">{index}</span>
+        <span className="h-px w-10 bg-silver/60" />
         {label}
       </p>
       <h2 className="mt-5 max-w-3xl text-4xl leading-[0.98] font-medium tracking-[-0.035em] text-balance sm:text-5xl lg:text-6xl">
@@ -19,9 +23,11 @@ export default function SectionHeading({ index, label, title }: SectionHeadingPr
   );
 }
 
-/** Italic serif accent used to echo the hero headline. */
+/** Italic serif accent in brushed metallic silver to echo the hero headline. */
 export function Accent({ children }: { children: React.ReactNode }) {
   return (
-    <em className="font-serif font-normal tracking-[-0.015em] text-ember italic">{children}</em>
+    <em className="font-serif font-normal tracking-[-0.015em] text-silver italic">
+      {children}
+    </em>
   );
 }

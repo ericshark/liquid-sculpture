@@ -1,19 +1,12 @@
 "use client";
 
 import SculptureHero from "@/components/ui/liquid-sculpture-hero";
-import { profile, siteMeta } from "@/data/portfolio";
+import { heroContent, navLinks } from "@/data/showcase";
 import { setTheme, useTheme } from "@/lib/theme";
 
-export const navLinks = [
-  { label: "About", href: "#about" },
-  { label: "Work", href: "#work" },
-  { label: "Experience", href: "#experience" },
-  { label: "Education", href: "#education" },
-];
-
 const palette = {
-  dark: { text: "#EDE6D8", accent: "#FF6A3D" },
-  light: { text: "#15171C", accent: "#D9481F" },
+  dark: { text: "#F4F5F7", accent: "#C8CED8" },
+  light: { text: "#0A0B0E", accent: "#4A505C" },
 };
 
 export default function PortfolioHero() {
@@ -25,20 +18,20 @@ export default function PortfolioHero() {
       darkSrc="/sculpture-dark.svg"
       mobileSrc="/sculpture-mobile-light.svg"
       mobileDarkSrc="/sculpture-mobile-dark.svg"
-      imageAlt="Braided filaments of ember and copper light, rebuilt from particles"
-      brand={profile.name}
+      imageAlt={heroContent.imageAlt}
+      brand={heroContent.brand}
       navLinks={navLinks}
-      navCta={{ label: "Contact", href: "#contact" }}
-      eyebrow={`${profile.role} — ${profile.location}`}
-      headline={"Database to interface,\nand the model in the middle."}
-      headlineAccent="the model in the middle."
-      body={siteMeta.description}
-      primaryCta={{ label: "Selected work", href: "#work" }}
-      secondaryCta={{ label: "Get in touch", href: `mailto:${profile.email}` }}
-      hint="Stir the filaments"
-      hintTouch="Touch the filaments"
-      background="#F1ECE2"
-      darkBackground="#0E1116"
+      navCta={heroContent.navCta}
+      eyebrow={heroContent.eyebrow}
+      headline={heroContent.headline}
+      headlineAccent={heroContent.headlineAccent}
+      body={heroContent.body}
+      primaryCta={heroContent.primaryCta}
+      secondaryCta={heroContent.secondaryCta}
+      hint={heroContent.hint}
+      hintTouch={heroContent.hintTouch}
+      background="#F5F6F8"
+      darkBackground="#07080A"
       theme={theme}
       onThemeChange={setTheme}
       textColor={palette[theme].text}
@@ -47,7 +40,8 @@ export default function PortfolioHero() {
       headingFont="var(--font-sans)"
       accentFont="var(--font-serif)"
       bodyFont="var(--font-sans)"
-      backdropText="systems"
+      backdropText={heroContent.backdropText}
+      showCredit={false}
       intro
       ambient
       ambientIntensity={0.6}

@@ -26,10 +26,10 @@ function mulberry32(seed) {
 }
 
 const PALETTES = {
-  // ember on ink: deep coals at the back, cream highlights at the front
-  dark: ["#5E1E0E", "#B83A17", "#FF6A3D", "#FFB088", "#F6EBDC"],
-  // copper and ink on paper
-  light: ["#EDC2A8", "#E0703F", "#D9481F", "#8A2C12", "#1B1D22"],
+  // liquid silver on obsidian: gunmetal shadows at the back, pure specular white at the front
+  dark: ["#1C2029", "#4E5564", "#949CA9", "#D4D8E1", "#FFFFFF"],
+  // brushed pewter and carbon ink on alabaster
+  light: ["#D5D9E2", "#9AA2B1", "#5E6573", "#262A33", "#0A0B0E"],
 };
 
 function hexToRgb(hex) {

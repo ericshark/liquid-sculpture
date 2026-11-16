@@ -389,6 +389,7 @@ class LiquidEngine {
   private opts: EngineOptions
   private onFail: () => void
   private lowPower = false
+  private softwareGL = false
   private stateFormat: { internal: number; type: number } = { internal: 0, type: 0 }
 
   private pFlow!: Prog
@@ -463,7 +464,11 @@ class LiquidEngine {
     if (!gl) throw new Error("WebGL2 unavailable")
     this.gl = gl
     const nav = navigator as Navigator & { deviceMemory?: number }
+    const dbg = gl.getExtension("WEBGL_debug_renderer_info")
+    const renderer = dbg ? String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)) : ""
+    this.softwareGL = /swiftshader|llvmpipe|software|softpipe/i.test(renderer)
     this.lowPower =
+      this.softwareGL ||
       (nav.hardwareConcurrency || 8) <= 4 ||
       (nav.deviceMemory || 8) <= 4 ||
       window.matchMedia("(pointer: coarse)").matches
@@ -585,7 +590,7 @@ class LiquidEngine {
   /** One particle per material pixel of a grid laid over the image. */
   private buildParticles(img: HTMLImageElement) {
     const gl = this.gl
-    const baseGrid = this.lowPower ? 640 : 1000
+    const baseGrid = this.softwareGL ? 320 : this.lowPower ? 640 : 1000
     const gw = Math.round(baseGrid * Math.sqrt(clamp(this.opts.density, 0.15, 2)))
     const gh = Math.max(1, Math.round(gw / this.aspect))
     this.gridW = gw
