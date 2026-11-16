@@ -1,4 +1,4 @@
-# Portfolio — liquid sculpture
+# Liquid Sculpture
 
 An experimental take on the portfolio: an "ink & ember" single page whose hero is a
 WebGL particle sculpture that turns liquid under the cursor. Text comes from the
