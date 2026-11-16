@@ -1,6 +1,6 @@
 /**
- * WebGL2 Stable-Fluids Background Animation (ported from Chromasonic's fluid.ts & shaders.ts)
- * Configured with Chromasonic's Nebula physics in monochrome black, white, and silver.
+ * WebGL2 Stable-Fluids Background Animation
+ * Monochrome black, white, and silver atmospheric fluid physics.
  */
 
 export interface FluidSettings {
@@ -298,7 +298,7 @@ export class Fluid {
   private iterations: number;
   private destroyed = false;
 
-  // Chromasonic Nebula preset parameters for smooth, atmospheric smoke
+  // Fluid preset parameters for smooth, atmospheric smoke
   settings: FluidSettings = {
     curl: 16,
     velocityDissipation: 0.3,

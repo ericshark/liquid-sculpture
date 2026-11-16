@@ -16,7 +16,7 @@ declare global {
   }
 }
 
-// Monochromatic silver/white palette replacing Chromasonic's red/rainbow hues
+// Monochromatic silver and white palette for fluid splats
 const SILVER_TONES: [number, number, number][] = [
   [0.82, 0.85, 0.91],
   [0.92, 0.94, 0.98],
@@ -191,7 +191,7 @@ export default function SmokeSection() {
       aria-label="Interactive silver smoke background"
       className="relative flex min-h-svh w-full flex-col justify-between overflow-hidden border-t border-border bg-background"
     >
-      {/* Pure Chromasonic smoke background canvas */}
+      {/* Interactive WebGL2 fluid smoke background canvas */}
       <canvas
         ref={canvasRef}
         id="fluid"
