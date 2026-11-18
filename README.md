@@ -1,18 +1,26 @@
-# Liquid Sculpture — FORMA®
+# Liquid Sculpture · FORMA®
 
-A minimal two-screen monochrome design showcase in black, white, and silver: featuring the original liquid particle sculpture hero on the first screen, followed directly by an interactive fluid smoke background animation on the second screen.
+An interactive design study in black, white, and silver. Move the pointer across a braided particle sculpture, then scroll to a second scene where it stirs a field of fluid smoke.
 
-```bash
-pnpm install
-pnpm dev -p 3001
+[Open Liquid Sculpture](https://liquid-sculpture.vercel.app)
+
+![Silver particle sculpture beside the FORMA design study introduction](docs/screenshots/silver-sculpture.jpg)
+
+![The Living Surface fluid smoke scene](docs/screenshots/living-surface.jpg)
+
+## How it works
+
+The Next.js site renders the sculpture and fluid simulation with WebGL. Both sections share a light and dark theme. A static sculpture is available as a fallback.
+
+## Run locally
+
+Use Node.js 24 and pnpm.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm dev --port 3001
 ```
 
-- `components/ui/liquid-sculpture-hero.tsx` — original particle sculpture hero.
-- `components/portfolio-hero.tsx` — feeds the hero its monochrome silver palette, sculptures, and design copy.
-- `lib/fluid-smoke.ts` & `components/smoke-section.tsx` — mouse-interactive monochrome silver WebGL2 smoke background rendered as the full-screen second section.
-- `scripts/make-sculpture.mjs` — regenerates the braided silver sculpture SVGs in `public/` (`node scripts/make-sculpture.mjs`).
-- Theme lives on `<html data-theme>`; the hero's toggle, sticky header, and smoke section share it.
+Open [localhost:3001](http://localhost:3001). Use `pnpm build` for a production build.
 
-## Motion & Browser Behavior
-
-All visual motion runs independently of operating-system reduced-motion settings (such as Windows animation restrictions / `prefers-reduced-motion: reduce`) by default. Pass `respectReducedMotion` to `SculptureHero` to opt into OS reduced-motion throttling. Hardware quality tiers and static SVG fallbacks remain active when WebGL2 is unavailable.
+[Deployment and configuration](docs/DEPLOYMENT.md)
